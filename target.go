@@ -17,6 +17,7 @@ type ipVersion uint8
 
 type target struct {
 	host      string
+	name 	  string
 	addresses []net.IPAddr
 	delay     time.Duration
 	resolver  *net.Resolver
@@ -90,7 +91,7 @@ func (t *target) add(addr net.IPAddr, monitor *mon.Monitor) error {
 }
 
 func (t *target) nameForIP(addr net.IPAddr) string {
-	return fmt.Sprintf("%s %s %s", t.host, addr.IP, getIPVersion(addr))
+	return fmt.Sprintf("%s %s %s %s", t.host, addr.IP, getIPVersion(addr), t.name)
 }
 
 func isIPAddrInSlice(ipa net.IPAddr, slice []net.IPAddr) bool {

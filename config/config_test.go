@@ -30,10 +30,14 @@ func TestParseConfig(t *testing.T) {
 		"2001:4860:4860::8844",
 	}
 
-	if !reflect.DeepEqual(targets, c.Targets) {
-		t.Errorf("expected 4 targets (%v) but got %d (%v)", targets, len(c.Targets), c.Targets)
-		t.FailNow()
+	for _, group := range c.Groups {
+		if !reflect.DeepEqual(targets, group.Targets) {
+			t.Errorf("expected 4 targets (%v) but got %d (%v)", targets, len(group.Targets), group.Targets)
+			t.FailNow()
+		}
 	}
+
+	
 
 	if expected := 2*time.Minute + 15*time.Second; time.Duration(c.DNS.Refresh) != expected {
 		t.Errorf("expected dns.refresh to be %v, got %v", expected, c.DNS.Refresh)

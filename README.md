@@ -16,12 +16,15 @@ For more information check the [source code][go-ping].
 Targets can be specified in a YAML based config file:
 
 ```yaml
-targets:
-  - 8.8.8.8
-  - 8.8.4.4
-  - 2001:4860:4860::8888
-  - 2001:4860:4860::8844
-  - google.com
+groups:
+  - name: "ping_group"
+    targets:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 2001:4860:4860::8888
+      - 2001:4860:4860::8844
+      - google.com
+
 
 dns:
   refresh: 2m15s

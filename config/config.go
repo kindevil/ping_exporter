@@ -10,7 +10,7 @@ import (
 
 // Config represents configuration for the exporter.
 type Config struct {
-	Targets []string `yaml:"targets"`
+	Groups []group `yaml:"groups"`
 
 	Ping struct {
 		Interval duration `yaml:"interval"`
@@ -27,6 +27,11 @@ type Config struct {
 	Options struct {
 		DisableIPv6 bool `yaml:"disableIPv6"` // prohibits DNS resolved IPv6 addresses
 	} `yaml:"options"`
+}
+
+type group struct {
+	Name string      `yaml:"name"`
+	Targets []string `yaml:"targets"`
 }
 
 type duration time.Duration

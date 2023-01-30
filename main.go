@@ -41,7 +41,6 @@ var (
 	dnsNameServer           = kingpin.Flag("dns.nameserver", "DNS server used to resolve hostname of targets").Default("").String()
 	disableIPv6             = kingpin.Flag("options.disable-ipv6", "Disable DNS from resolving IPv6 AAAA records").Default().Bool()
 	logLevel                = kingpin.Flag("log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]").Default("info").String()
-	targets                 = kingpin.Arg("targets", "A list of targets to ping").Strings()
 )
 
 var (
@@ -99,8 +98,8 @@ func main() {
 		kingpin.FatalUsage("ping.size must be between 0 and 65500")
 	}
 
-	if len(cfg.Targets) == 0 {
-		kingpin.FatalUsage("No targets specified")
+	if len(cfg.Groups) == 0 {
+		kingpin.FatalUsage("No group specified")
 	}
 
 	m, err := startMonitor(cfg)
@@ -146,19 +145,24 @@ func startMonitor(cfg *config.Config) (*mon.Monitor, error) {
 		cfg.Ping.Timeout.Duration())
 	monitor.HistorySize = cfg.Ping.History
 
-	targets := make([]*target, len(cfg.Targets))
-	for i, host := range cfg.Targets {
-		t := &target{
-			host:      host,
-			addresses: make([]net.IPAddr, 0),
-			delay:     time.Duration(10*i) * time.Millisecond,
-			resolver:  resolver,
-		}
-		targets[i] = t
-
-		err := t.addOrUpdateMonitor(monitor, cfg.Options.DisableIPv6)
-		if err != nil {
-			log.Errorln(err)
+	targets := make([]*target, 0)
+	i := 0
+	for _, group := range cfg.Groups {
+		for _, host := range group.Targets {
+			t := &target{
+				host:      host,
+				name:      group.Name,
+				addresses: make([]net.IPAddr, 0),
+				delay:     time.Duration(10*i) * time.Millisecond,
+				resolver:  resolver,
+			}
+			targets = append(targets, t)
+			i++
+	
+			err := t.addOrUpdateMonitor(monitor, cfg.Options.DisableIPv6)
+			if err != nil {
+				log.Errorln(err)
+			}
 		}
 	}
 
@@ -301,9 +305,6 @@ func setupResolver(cfg *config.Config) *net.Resolver {
 // addFlagToConfig updates cfg with command line flag values, unless the
 // config has non-zero values.
 func addFlagToConfig(cfg *config.Config) {
-	if len(cfg.Targets) == 0 {
-		cfg.Targets = *targets
-	}
 	if cfg.Ping.History == 0 {
 		cfg.Ping.History = *historySize
 	}
