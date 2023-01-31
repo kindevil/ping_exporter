@@ -9,6 +9,8 @@ For more information check the [source code][go-ping].
 
 [go-ping]: https://github.com/digineo/go-ping
 
+``In this repository added group support.``
+
 ## Getting Started
 
 ### Config file
